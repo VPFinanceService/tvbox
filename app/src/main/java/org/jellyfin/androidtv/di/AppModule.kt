@@ -26,6 +26,7 @@ import org.jellyfin.androidtv.data.repository.NotificationsRepository
 import org.jellyfin.androidtv.data.repository.NotificationsRepositoryImpl
 import org.jellyfin.androidtv.data.repository.UserViewsRepository
 import org.jellyfin.androidtv.data.repository.UserViewsRepositoryImpl
+import org.jellyfin.androidtv.data.zip0.Zip0ApiClient
 import org.jellyfin.androidtv.data.service.BackgroundService
 import org.jellyfin.androidtv.integration.dream.DreamViewModel
 import org.jellyfin.androidtv.ui.InteractionTrackerViewModel
@@ -40,6 +41,8 @@ import org.jellyfin.androidtv.ui.playback.external.MpvExternalPlayerApi
 import org.jellyfin.androidtv.ui.playback.external.MxExternalPlayerApi
 import org.jellyfin.androidtv.ui.playback.external.VimuExternalPlayerApi
 import org.jellyfin.androidtv.ui.playback.external.VlcExternalPlayerApi
+import org.jellyfin.androidtv.ui.playback.zip0.Zip0PlaybackLauncher
+import org.jellyfin.androidtv.ui.playback.zip0.Zip0QueueManager
 import org.jellyfin.androidtv.ui.playback.nextup.NextUpViewModel
 import org.jellyfin.androidtv.ui.playback.segment.MediaSegmentRepository
 import org.jellyfin.androidtv.ui.playback.segment.MediaSegmentRepositoryImpl
@@ -147,7 +150,10 @@ val appModule = module {
 	single<ItemMutationRepository> { ItemMutationRepositoryImpl(get(), get()) }
 	single<CustomMessageRepository> { CustomMessageRepositoryImpl() }
 	single<NavigationRepository> { NavigationRepositoryImpl(Destinations.home) }
+	single { Zip0ApiClient() }
 	single<SearchRepository> { SearchRepositoryImpl(get()) }
+	single { Zip0QueueManager() }
+	single { Zip0PlaybackLauncher(get(), get(), get()) }
 	single<MediaSegmentRepository> { MediaSegmentRepositoryImpl(get(), get()) }
 	single<ExternalAppRepository> { ExternalAppRepository(get(), getAll(), get<DefaultExternalPlayerApi>()) }
 
@@ -177,5 +183,5 @@ val appModule = module {
 	single { ReportingHelper(get(), get()) }
 	single<PlaybackHelper> { SdkPlaybackHelper(get(), get(), get(), get()) }
 
-	factory { (context: Context) -> SearchFragmentDelegate(context, get(), get()) }
+	factory { (context: Context) -> SearchFragmentDelegate(context, get(), get(), get()) }
 }

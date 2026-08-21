@@ -17,6 +17,7 @@ import org.jellyfin.androidtv.ui.playback.MediaManager
 import org.jellyfin.androidtv.ui.playback.PlaybackLauncher
 import org.jellyfin.androidtv.ui.playback.VideoQueueManager
 import org.jellyfin.androidtv.ui.playback.rewrite.RewriteMediaManager
+import org.jellyfin.androidtv.playback.zip0Plugin
 import org.jellyfin.androidtv.util.AndroidVersion
 import org.jellyfin.androidtv.util.profile.createDeviceProfile
 import org.jellyfin.playback.core.playbackManager
@@ -94,6 +95,7 @@ fun Scope.createPlaybackManager() = playbackManager(androidContext()) {
 
 	val deviceProfileBuilder = { createDeviceProfile(androidContext(), userPreferences, get()) }
 	install(jellyfinPlugin(get(), deviceProfileBuilder, setOf(MediaSegmentType.INTRO), ProcessLifecycleOwner.get().lifecycle))
+	install(zip0Plugin(get()))
 
 	// Options
 	val userSettingPreferences = get<UserSettingPreferences>()
