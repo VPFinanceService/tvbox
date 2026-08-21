@@ -208,26 +208,6 @@ class Zip0ApiClient(
 			},
 		)
 	}
-
-	private fun Map<String, JsonAny?>.toVideo(): Zip0Video? {
-		val id = str("id") ?: return null
-		val source = str("source") ?: return null
-		return Zip0Video(
-			id = id,
-			source = source,
-			sourceName = str("sourceName").orEmpty(),
-			title = str("title").orEmpty(),
-			poster = str("poster"),
-			year = str("year"),
-			remarks = str("remarks"),
-			category = str("category"),
-			area = str("area"),
-			language = str("language"),
-			score = str("score"),
-			episodeCount = int("episodeCount"),
-			updatedAt = str("updatedAt"),
-		)
-	}
 }
 
 // ---- type aliases for the deserialized Seroval graph ----
@@ -241,6 +221,26 @@ private fun JsonAny?.asList(): List<JsonAny?> = this as? List<JsonAny?> ?: empty
 private fun Map<String, JsonAny?>.str(key: String): String? = this[key] as? String
 
 private fun Map<String, JsonAny?>.int(key: String): Int? = (this[key] as? Number)?.toInt()
+
+private fun Map<String, JsonAny?>.toVideo(): Zip0Video? {
+	val id = str("id") ?: return null
+	val source = str("source") ?: return null
+	return Zip0Video(
+		id = id,
+		source = source,
+		sourceName = str("sourceName").orEmpty(),
+		title = str("title").orEmpty(),
+		poster = str("poster"),
+		year = str("year"),
+		remarks = str("remarks"),
+		category = str("category"),
+		area = str("area"),
+		language = str("language"),
+		score = str("score"),
+		episodeCount = int("episodeCount"),
+		updatedAt = str("updatedAt"),
+	)
+}
 
 // ---- Seroval serialization (request payload) ----
 
