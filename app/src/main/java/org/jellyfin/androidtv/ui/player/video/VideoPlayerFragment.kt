@@ -10,6 +10,8 @@ import kotlinx.coroutines.launch
 import org.jellyfin.androidtv.ui.base.BaseScreen
 import org.jellyfin.androidtv.ui.playback.VideoQueueManager
 import org.jellyfin.androidtv.ui.playback.rewrite.RewriteMediaManager
+import org.jellyfin.androidtv.ui.playback.zip0.Zip0QueueManager
+import org.jellyfin.androidtv.ui.playback.zip0.Zip0QueueSupplier
 import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.core.queue.queue
 import org.jellyfin.sdk.api.client.ApiClient
@@ -23,17 +25,26 @@ class VideoPlayerFragment : Fragment() {
 	}
 
 	private val videoQueueManager by inject<VideoQueueManager>()
+	private val zip0QueueManager by inject<Zip0QueueManager>()
 	private val playbackManager by inject<PlaybackManager>()
 	private val api by inject<ApiClient>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
-		// Create a queue from the items added to the legacy video queue
-		val queueSupplier = RewriteMediaManager.BaseItemQueueSupplier(api, videoQueueManager.getCurrentVideoQueue(), false)
-		Timber.i("Created a queue with ${queueSupplier.items.size} items")
+		// A zip0.com video queued via the launcher takes precedence over the legacy queue.
+		val zip0Detail = zip0QueueManager.detail
 		playbackManager.queue.clear()
-		playbackManager.queue.addSupplier(queueSupplier)
+
+		if (zip0Detail != null && zip0Detail.episodes.isNotEmpty()) {
+			zip0QueueManager.clear()
+			playbackManager.queue.addSupplier(Zip0QueueSupplier(zip0Detail))
+			Timber.i("Created a zip0 queue with ${zip0Detail.episodes.size} items")
+		} else {
+			val queueSupplier = RewriteMediaManager.BaseItemQueueSupplier(api, videoQueueManager.getCurrentVideoQueue(), false)
+			Timber.i("Created a queue with ${queueSupplier.items.size} items")
+			playbackManager.queue.addSupplier(queueSupplier)
+		}
 
 		// Set position
 		arguments?.getInt(EXTRA_POSITION)?.milliseconds?.let {

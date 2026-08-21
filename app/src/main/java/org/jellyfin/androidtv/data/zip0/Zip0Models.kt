@@ -1,5 +1,9 @@
 package org.jellyfin.androidtv.data.zip0
 
+import java.util.Collections
+import java.util.UUID
+import java.util.WeakHashMap
+
 /**
  * Data models mirroring the zip0.com server function responses.
  *
@@ -71,4 +75,45 @@ data class Zip0Health(
 data class Zip0VideoPage(
 	val items: List<Zip0Video> = emptyList(),
 	val health: Zip0Health? = null,
+)
+
+/**
+ * Stable application-local [UUID] for a zip0.com video. This is the id used when a
+ * [Zip0Video] is adapted into a [org.jellyfin.sdk.model.api.BaseItemDto], so it can be
+ * looked up again in [Zip0ItemRegistry] when the item is clicked.
+ */
+fun Zip0Video.uid(): UUID = UUID.nameUUIDFromBytes("zip0:$source:$id".toByteArray())
+
+/**
+ * Registry mapping the stable [UUID] of a search-result [Zip0Video] back to the original
+ * zip0.com source. Used to recognize a zip0 result when it is selected, so we can play it
+ * directly instead of treating it as a Jellyfin library item.
+ */
+object Zip0ItemRegistry {
+	private val entries: MutableMap<UUID, Zip0Video> = Collections.synchronizedMap(WeakHashMap())
+
+	fun put(video: Zip0Video) {
+		entries[video.uid()] = video
+	}
+
+	fun get(id: UUID): Zip0Video? = entries[id]
+
+	fun clear() = entries.clear()
+}
+
+/** Adapt a full [Zip0VideoDetail] into a [Zip0Video] (used when building playback queue entries). */
+fun Zip0VideoDetail.toVideo() = Zip0Video(
+	id = id,
+	source = source,
+	sourceName = sourceName,
+	title = title,
+	poster = poster,
+	year = year,
+	remarks = remarks,
+	category = category,
+	area = area,
+	language = language,
+	score = score,
+	episodeCount = episodeCount,
+	updatedAt = updatedAt,
 )
