@@ -26,6 +26,7 @@ import org.jellyfin.androidtv.data.repository.NotificationsRepository
 import org.jellyfin.androidtv.data.repository.NotificationsRepositoryImpl
 import org.jellyfin.androidtv.data.repository.UserViewsRepository
 import org.jellyfin.androidtv.data.repository.UserViewsRepositoryImpl
+import org.jellyfin.androidtv.data.zip0.Zip0ApiClient
 import org.jellyfin.androidtv.data.service.BackgroundService
 import org.jellyfin.androidtv.integration.dream.DreamViewModel
 import org.jellyfin.androidtv.ui.InteractionTrackerViewModel
@@ -147,6 +148,7 @@ val appModule = module {
 	single<ItemMutationRepository> { ItemMutationRepositoryImpl(get(), get()) }
 	single<CustomMessageRepository> { CustomMessageRepositoryImpl() }
 	single<NavigationRepository> { NavigationRepositoryImpl(Destinations.home) }
+	single { Zip0ApiClient() }
 	single<SearchRepository> { SearchRepositoryImpl(get()) }
 	single<MediaSegmentRepository> { MediaSegmentRepositoryImpl(get(), get()) }
 	single<ExternalAppRepository> { ExternalAppRepository(get(), getAll(), get<DefaultExternalPlayerApi>()) }
